@@ -14,6 +14,7 @@
   tasks:
     # DOCS AT https://weewx.com/docs/5.0/
     # https://weewx.com/docs/5.0/quickstarts/debian/
+    # See also  https://github.com/vinceskahan/weewx-sdr-howto/blob/main/howto.txt
     - name: install weewx prereqs
       ansible.builtin.apt:
         name: wget, gnupg
@@ -28,9 +29,10 @@
       ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
 
       # bleh, there's a quiz when you install it by hand.  "apt-get remove weewx; apt-get install weewx"
+      # actually, it installed for me ok on 5.0.2-1
     - name: install weewx
       ansible.builtin.apt:
-        name: weewx=5.0.2, nginx
+        name: weewx=5.0.2-1, nginx
         update_cache: yes
        
       # SDR driver: https://github.com/matthewwall/weewx-sdr
@@ -39,11 +41,13 @@
       
       # weewx executables in /usr/share/weewx
       # https://github.com/matthewwall/weewx-sdr/issues/183  for the 5.0 version
+      # and it asks for permission, apparently not scriptable
+      # I had to run it by hand and then restart the playbook on the next step
     - name: install the SDR driver
       ansible.builtin.shell: weectl extension install weewx-sdr.zip
       
     - name: configure the SDR driver
-      ansible.builtin.shell: /etc/weewx/scripts/wee_config --reconfigure --driver=user.sdr --no-prompt
+      ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
       
       # 4) run the driver directly to identify the packets you want to capture
       # cd /usr/share/weewx
@@ -54,6 +58,7 @@
         state: directory
         path: "{{ item }}"
         mode: '0755'
+        owner: weewx
       loop:
         - "{{ weewx_html }}"
         - "{{ weewx_database }}"
@@ -70,7 +75,14 @@
         dest: /etc/nginx/sites-available/default
         mode: '0644'
         
-    - name: restart weewx service
+    - name: Add weewx user to adm group
+      ansible.builtin.user:
+        name: weewx
+        groups: 
+          - weewx
+          - adm
+
+   - name: restart weewx service
       ansible.builtin.service:
         name: weewx
         state: restarted
@@ -81,6 +93,7 @@
         name: lighttpd
         state: stopped
         enabled: no
+      ignore_errors: yes
         
     - name: restart nginx service
       ansible.builtin.service:
