@@ -1,4 +1,4 @@
-Run the Geekworm file
+Run the Geekworm file (GeekwormNSAPI.txt)
 
 sudo apt update
 sudo apt upgrade

@@ -1,0 +1,15 @@
+---
+
+- hosts: localhost
+  become: True
+  become_user: root
+  connection: local
+  gather_facts: False
+  vars:
+    
+  tasks:
+    - name: install tailscale
+      ansible.builtin.shell: curl -fsSL https://tailscale.com/install.sh | sh
+      ignore_errors: yes
+      # sudo apt-get install -y tailscale tailscale-archive-keyring
+      # sudo systemctl enable --now tailscaled

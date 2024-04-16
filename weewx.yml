@@ -1,0 +1,96 @@
+---
+
+- hosts: localhost
+  become: True
+  become_user: root
+  connection: local
+  gather_facts: False
+  vars:
+    weewx_home: /media/ken/umbrel/weewx
+    weewx_html: "{{ weewx_home }}/html"
+    weewx_database: "{{ weewx_home }}/data"
+      
+    
+  tasks:
+    # DOCS AT https://weewx.com/docs/5.0/
+    # https://weewx.com/docs/5.0/quickstarts/debian/
+    - name: install weewx prereqs
+      ansible.builtin.apt:
+        name: wget, gnupg
+
+    - name: install weewx apt key
+      ansible.builtin.shell: wget -qO - https://weewx.com/keys.html | sudo gpg --dearmor --output /etc/apt/trusted.gpg.d/weewx.gpg
+      
+    - name: add weewx repository
+      ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 buster main" | sudo tee /etc/apt/sources.list.d/weewx.list
+      
+    - name: get the weewx pubkey
+      ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
+
+      # bleh, there's a quiz when you install it by hand.  "apt-get remove weewx; apt-get install weewx"
+    - name: install weewx
+      ansible.builtin.apt:
+        name: weewx=5.0.2, nginx
+        update_cache: yes
+       
+      # SDR driver: https://github.com/matthewwall/weewx-sdr
+    - name: get the SDR driver
+      ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
+      
+      # weewx executables in /usr/share/weewx
+      # https://github.com/matthewwall/weewx-sdr/issues/183  for the 5.0 version
+    - name: install the SDR driver
+      ansible.builtin.shell: weectl extension install weewx-sdr.zip
+      
+    - name: configure the SDR driver
+      ansible.builtin.shell: /etc/weewx/scripts/wee_config --reconfigure --driver=user.sdr --no-prompt
+      
+      # 4) run the driver directly to identify the packets you want to capture
+      # cd /usr/share/weewx
+      # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
+      
+    - name: create the custom weewx SSD directories
+      ansible.builtin.file:
+        state: directory
+        path: "{{ item }}"
+        mode: '0755'
+      loop:
+        - "{{ weewx_html }}"
+        - "{{ weewx_database }}"
+        
+    - name: create weewx conf file
+      ansible.builtin.template:
+        src: weewx.conf
+        dest: /etc/weewx/weewx.conf
+        mode: '0644'
+      
+    - name: create nginx conf file
+      ansible.builtin.template:
+        src: nginx.conf
+        dest: /etc/nginx/sites-available/default
+        mode: '0644'
+        
+    - name: restart weewx service
+      ansible.builtin.service:
+        name: weewx
+        state: restarted
+        enabled: yes
+
+    - name: disable lighttpd
+      ansible.builtin.service:
+        name: lighttpd
+        state: stopped
+        enabled: no
+        
+    - name: restart nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+        enabled: yes
+        
+    - name: cron job for database backup
+      ansible.builtin.cron:
+        name: backup weewx database
+        minute: "12"
+        job: "cp {{ weewx_database }}/weewx.sdb {{ weewx_database }}/weewx-backup.sdb"
+
