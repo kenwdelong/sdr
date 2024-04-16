@@ -1,0 +1,11 @@
+sudo systemctl stop weewx
+sudo sqlite3 weewx.sdb 
+  select * from archive where extraTemp2 > 100;                      from https://weewx.com/docs/customizing.htm#The_database
+  select dateTime, extraTemp2 from archive where extraTemp2 > 100;   and then https://www.epochconverter.com/
+  delete from archive where extraTemp2 > 100;
+  Ctrl-D to exit
+sudo systemctl start weewx
+
+
+PORT 80
+Sometimes lighttpd has control of port 80, stop it with sudo systemctl stop lighttpd

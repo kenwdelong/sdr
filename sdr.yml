@@ -1,0 +1,181 @@
+---
+
+- hosts: localhost
+  become: True
+  become_user: root
+  connection: local
+  gather_facts: False
+  vars:
+    app_dir: /home/ken/apps
+    user_name: ken
+    repo_name: /tmp/fa-repo.dpkg
+    weewx_home: /media/ken/umbrel/weewx
+    weewx_html: "{{ weewx_home }}/html"
+    weewx_database: "{{ weewx_home }}/data"
+      
+    
+  tasks:
+    - name: blacklist the default driver
+      ansible.builtin.lineinfile: 
+        path: /etc/modprobe.d/blacklist-dvb.conf
+        line: "blacklist dvb_usb_rtl28xxu"
+        create: true
+        
+    - name: install rtl-sdr drivers
+      ansible.builtin.apt:
+        name: rtl-sdr
+        state: present
+        #force_apt_get: true
+
+    - name: add the rule file to the thingy
+      ansible.builtin.lineinfile: 
+        path: /etc/udev/rules.d/20.rtlsdr.rules
+        line: SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", GROUP="adm", MODE="0666", SYMLINK+="rtl_sdr"
+        create: true
+        
+    - name: restart udev
+      ansible.builtin.systemd:
+        name: udev
+        state: restarted
+        
+    - name: create app folder
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ user_name }}"
+        
+#    - name: download CubicSDR file
+#      ansible.builtin.get_url:
+#        url: https://github.com/cjcliffe/CubicSDR/releases/download/0.2.5/CubicSDR-0.2.5-x86_64.AppImage
+#        dest: "{{ app_dir }}" 
+#        owner: "{{ user_name }}"
+#        mode: '0755'
+
+    - name: install CubicSDR
+      ansible.builtin.apt:
+        name: cubicsdr
+        state: present
+        #force_apt_get: true
+        
+    - name: download GQRX file
+      ansible.builtin.get_url:
+        url: https://github.com/gqrx-sdr/gqrx/releases/download/v2.16/Gqrx-2.16-x86_64.AppImage
+        dest: "{{ app_dir }}" 
+        owner: "{{ user_name }}"
+        mode: '0755'
+        
+    - name: install rtl-433 
+      ansible.builtin.apt:
+        name: rtl-433
+        state: present
+        #force_apt_get: true
+
+    #- name: install dump1090-fa
+    #  block:
+        #- name: get the FA repo
+        #  ansible.builtin.get_url:
+        #    url: https://flightaware.com/adsb/piaware/files/packages/pool/piaware/f/flightaware-apt-repository/flightaware-apt-repository_1.1_all.deb
+        #    dest: "{{ repo_name }}"
+
+        #- name: install FA repo
+        #  command: dpkg -i {{ repo_name }}
+
+          # This didn't work, but from the command line it did.
+          # And I don't think the stuff above is necessary
+        #- name: install dump1090 package
+        #  ansible.builtin.apt:
+        #    update_cache: true
+        #    name: dump1090-fa
+        #    force_apt_get: true
+        #    state: present
+
+    - name: install weewx weather station
+      # DOCS AT https://weewx.com/docs/5.0/
+      block:
+        # https://weewx.com/docs/5.0/quickstarts/debian/
+        - name: install weewx prereqs
+          ansible.builtin.apt:
+            name: wget, gnupg
+
+        - name: install weewx apt key
+          ansible.builtin.shell: wget -qO - https://weewx.com/keys.html | sudo gpg --dearmor --output /etc/apt/trusted.gpg.d/weewx.gpg
+          
+        - name: add weewx repository
+          ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 buster main" | sudo tee /etc/apt/sources.list.d/weewx.list
+          
+        - name: get the weewx pubkey
+          ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
+
+          # bleh, there's a quiz when you install it by hand.  "apt-get remove weewx; apt-get install weewx"
+        - name: install weewx
+          ansible.builtin.apt:
+            name: weewx=5.0.2, nginx
+            update_cache: yes
+           
+          # SDR driver: https://github.com/matthewwall/weewx-sdr
+                
+        - name: get the SDR driver
+          ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
+          
+          # weewx executables in /usr/share/weewx
+		  # https://github.com/matthewwall/weewx-sdr/issues/183
+        - name: install the SDR driver
+          ansible.builtin.shell: weectl extension install weewx-sdr.zip
+          
+        - name: configure the SDR driver
+          ansible.builtin.shell: /etc/weewx/scripts/wee_config --reconfigure --driver=user.sdr --no-prompt
+          
+          # 4) run the driver directly to identify the packets you want to capture
+          # cd /usr/share/weewx
+          # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
+          
+        - name: create the custom weewx SSD directories
+          ansible.builtin.file:
+            state: directory
+            path: "{{ item }}"
+            mode: '0755'
+          loop:
+            - "{{ weewx_html }}"
+            - "{{ weewx_database }}"
+            
+        - name: create weewx conf file
+          ansible.builtin.template:
+            src: weewx.conf
+            dest: /etc/weewx/weewx.conf
+            mode: '0644'
+          
+        - name: create nginx conf file
+          ansible.builtin.template:
+            src: nginx.conf
+            dest: /etc/nginx/sites-available/default
+            mode: '0644'
+            
+        - name: restart weewx service
+          ansible.builtin.service:
+            name: weewx
+            state: restarted
+            enabled: yes
+
+        - name: disable lighttpd
+          ansible.builtin.service:
+            name: lighttpd
+            state: stopped
+            enabled: no
+            
+        - name: restart nginx service
+          ansible.builtin.service:
+            name: nginx
+            state: restarted
+            enabled: yes
+            
+        - name: cron job for database backup
+          ansible.builtin.cron:
+            name: backup weewx database
+            minute: "12"
+            job: "cp {{ weewx_database }}/weewx.sdb {{ weewx_database }}/weewx-backup.sdb"
+
+    - name: install tailscale
+      ansible.builtin.shell: curl -fsSL https://tailscale.com/install.sh | sh
+      ignore_errors: yes
+      # sudo apt-get install -y tailscale tailscale-archive-keyring
+      # sudo systemctl enable --now tailscaled
