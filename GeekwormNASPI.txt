@@ -13,30 +13,6 @@ sudo ./install-fan-service.sh
 sudo ./install-pwr-service.sh
 sudo ./install-sss.sh
 
-
-
-### OLD
-
-To install pwm fan, first add dtoverlay=pwm-2chan to /boot/config.txt under [all] or the end of file and reboot:
-
-git clone https://github.com/geekworm-com/xscript
-cd xscript
-chmod +x *.sh
-
-sudo cp -f ./x-c1-fan.sh                /usr/local/bin/
-sudo cp -f ./x-c1-fan.service           /lib/systemd/system
-sudo systemctl daemon-reload
-sudo systemctl enable x-c1-fan
-sudo systemctl start x-c1-fan
-
-sudo cp -f ./x-c1-pwr.sh                /usr/local/bin/
-sudo cp -f x-c1-pwr.service             /lib/systemd/system
-sudo systemctl daemon-reload
-sudo systemctl enable x-c1-pwr
-sudo systemctl start x-c1-pwr
-
-sudo cp -f ./x-c1-softsd.sh             /usr/local/bin/
-echo "alias xoff='sudo /usr/local/bin/x-c1-softsd.sh'" >>   ~/.bashrc
-source ~/.bashrc
-
 From now on, use "xoff" to turn off the Pi!
+
+
