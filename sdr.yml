@@ -54,12 +54,13 @@
         state: present
         #force_apt_get: true
         
-    - name: download GQRX file
-      ansible.builtin.get_url:
-        url: https://github.com/gqrx-sdr/gqrx/releases/download/v{{ gqrx_version }}/Gqrx-{{ gqrx_version }}-x86_64.AppImage
-        dest: "{{ app_dir }}" 
-        owner: "{{ user_name }}"
-        mode: '0755'
+# This doesn't work, because the RPi is not x86 architecture, it's ARM. GQRX is only windows, mac, and x86 AppImage
+#    - name: download GQRX file
+#      ansible.builtin.get_url:
+#        url: https://github.com/gqrx-sdr/gqrx/releases/download/v{{ gqrx_version }}/Gqrx-{{ gqrx_version }}-x86_64.AppImage
+#        dest: "{{ app_dir }}" 
+#        owner: "{{ user_name }}"
+#        mode: '0755'
         
     - name: install rtl-433 
       ansible.builtin.apt:
