@@ -6,7 +6,7 @@
   connection: local
   gather_facts: False
   vars:
-    weewx_home: /media/ken/umbrel/weewx
+    weewx_home: /media/ken/umbrel1/weewx
     weewx_html: "{{ weewx_home }}/html"
     weewx_database: "{{ weewx_home }}/data"
       
