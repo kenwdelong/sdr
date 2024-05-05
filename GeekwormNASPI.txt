@@ -1,5 +1,22 @@
 # https://wiki.geekworm.com/XScript
 
+To install pwm fan, first add dtoverlay=pwm-2chan to /boot/firmware/config.txt under [all] or the end of file and reboot:
+
+sudo apt install -y gpiod git
+
+git clone https://github.com/geekworm-com/xscript
+
+cd xscript
+chmod +x *.sh
+
+sudo ./install-fan-service.sh
+sudo ./install-pwr-service.sh
+sudo ./install-sss.sh
+
+
+
+### OLD
+
 To install pwm fan, first add dtoverlay=pwm-2chan to /boot/config.txt under [all] or the end of file and reboot:
 
 git clone https://github.com/geekworm-com/xscript
