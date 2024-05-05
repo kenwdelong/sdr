@@ -82,7 +82,7 @@
           - weewx
           - adm
 
-   - name: restart weewx service
+    - name: restart weewx service
       ansible.builtin.service:
         name: weewx
         state: restarted
