@@ -6,7 +6,8 @@
   connection: local
   gather_facts: False
   vars:
-    weewx_home: /media/ken/umbrel1/weewx
+    #weewx_home: /media/ken/umbrel1/weewx
+    weewx_home: /opt/weewx
     weewx_html: "{{ weewx_home }}/html"
     weewx_database: "{{ weewx_home }}/data"
       
@@ -50,7 +51,7 @@
       ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
       
       # 4) run the driver directly to identify the packets you want to capture
-      # cd /usr/share/weewx
+      # cd /etc/weewx/bin
       # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
       
     - name: create the custom weewx SSD directories
