@@ -33,7 +33,7 @@
       # actually, it installed for me ok on 5.0.2-1
     - name: install weewx
       ansible.builtin.apt:
-        name: weewx=5.0.2-1, nginx
+        name: weewx=5.0.3, nginx
         update_cache: yes
        
       # SDR driver: https://github.com/matthewwall/weewx-sdr
