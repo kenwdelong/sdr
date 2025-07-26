@@ -33,22 +33,24 @@
       # actually, it installed for me ok on 5.0.2-1
     - name: install weewx
       ansible.builtin.apt:
-        name: weewx=5.0.3, nginx
+        name: weewx=5.1, nginx
         update_cache: yes
        
       # SDR driver: https://github.com/matthewwall/weewx-sdr
     - name: get the SDR driver
-      ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
-      
+      #ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
+      ansible.builtin.shell: weectl extension install https://github.com/matthewwall/weewx-sdr/archive/master.zip
+
       # weewx executables in /usr/share/weewx
       # https://github.com/matthewwall/weewx-sdr/issues/183  for the 5.0 version
       # and it asks for permission, apparently not scriptable
       # I had to run it by hand and then restart the playbook on the next step
-    - name: install the SDR driver
-      ansible.builtin.shell: weectl extension install weewx-sdr.zip
-      
-    - name: configure the SDR driver
-      ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
+#    - name: install the SDR driver
+#      ansible.builtin.shell: weectl extension install weewx-sdr.zip
+
+#      This apparently adds to your weewx.conf file, which I've already done'      
+#    - name: configure the SDR driver
+#      ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
       
       # 4) run the driver directly to identify the packets you want to capture
       # cd /etc/weewx/bin
