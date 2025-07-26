@@ -67,6 +67,20 @@
         name: rtl-433
         state: present
         #force_apt_get: true
+        
+#    - name: copy rtl_433 service file
+#      ansible.builtin.copy:
+#        src: rtl_433.service
+#        dest: /etc/systemd/system/rtl_433.service
+#        owner: root
+#        group: root
+#        mode: '0644'        
+#
+#    - name: Enable and start rtl_433 service
+#      ansible.builtin.systemd:
+#        name: rtl_433
+#        enabled: true
+#        state: started
 
     #- name: install dump1090-fa
     #  block:

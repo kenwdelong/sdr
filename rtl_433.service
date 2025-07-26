@@ -1,0 +1,10 @@
+[Unit]
+Description=rtl_433 SDR Receiver
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/rtl_433 -F json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
