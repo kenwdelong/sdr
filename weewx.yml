@@ -26,8 +26,8 @@
     - name: add weewx repository
       ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 buster main" | sudo tee /etc/apt/sources.list.d/weewx.list
       
-    - name: get the weewx pubkey
-      ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
+#    - name: get the weewx pubkey
+#      ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
 
       # bleh, there's a quiz when you install it by hand.  "apt-get remove weewx; apt-get install weewx"
       # actually, it installed for me ok on 5.0.2-1
@@ -55,6 +55,17 @@
       # cd /etc/weewx/bin
       # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
       
+    - name: Add weewx user to adm group
+      ansible.builtin.user:
+        name: weewx
+        groups: 
+          - weewx
+          - adm
+          - plugdev
+
+    - name: do some shit with buffers
+      ansible.builtin.shell: echo 0 > /sys/module/usbcore/parameters/usbfs_memory_mb          
+          
     - name: create the custom weewx SSD directories
       ansible.builtin.file:
         state: directory
@@ -77,13 +88,6 @@
         dest: /etc/nginx/sites-available/default
         mode: '0644'
         
-    - name: Add weewx user to adm group
-      ansible.builtin.user:
-        name: weewx
-        groups: 
-          - weewx
-          - adm
-
     - name: restart weewx service
       ansible.builtin.service:
         name: weewx

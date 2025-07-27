@@ -37,8 +37,11 @@ echo "deb [arch=all] https://weewx.com/apt/python3 buster main" | \
     sudo tee /etc/apt/sources.list.d/weewx.list
 ls /var/www/html/weewx/index.html
 
-sudo weectl extension install https://github.com/matthewwall/weewx-sdr/archive/master.zip
-sudo usermod -a -G weewx ken
+SUDO AGAIN
+weectl extension install https://github.com/matthewwall/weewx-sdr/archive/master.zip
+echo 0 > /sys/module/usbcore/parameters/usbfs_memory_mb
+usermod -a -G weewx ken
+usermod -a -G plugdev weewx
 UNREAL YOU HAVE TO LOG OUT AND BACK IN FOR THIS TO WORK
 
 

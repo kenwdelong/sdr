@@ -15,8 +15,14 @@
     - name: blacklist the default driver
       ansible.builtin.lineinfile: 
         path: /etc/modprobe.d/blacklist-dvb.conf
-        line: "blacklist dvb_usb_rtl28xxu"
+        #line: "blacklist dvb_usb_rtl28xxu"
+        line: "{{ item }}"
         create: true
+      loop:
+        - blacklist dvb_usb_rtl28xxu
+        - blacklist rtl2832
+        - blacklist rtl2830
+
         
     - name: install rtl-sdr drivers
       ansible.builtin.apt:
