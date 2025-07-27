@@ -51,7 +51,7 @@
 #      This apparently adds to your weewx.conf file, which I've already done'      
 #    - name: configure the SDR driver
 #      ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
-      
+      sudo
       # 4) run the driver directly to identify the packets you want to capture
       # cd /etc/weewx/bin
       # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
