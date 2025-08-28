@@ -18,10 +18,25 @@ sudo make install
 sudo cp ../rtl-sdr.rules /etc/udev/rules.d/
 sudo ldconfig
 
+# Either way
 sudo vi /etc/modprobe.d/blacklist-dvb.conf
 	blacklist dvb_usb_rtl28xxu
 	blacklist rtl2832
 	blacklist rtl2830
+  blacklist rtl2832_sdr
+- or -
+echo "blacklist dvb_usb_rtl28xxu
+blacklist rtl2832
+blacklist rtl2830
+blacklist rtl2832_sdr" | sudo tee /etc/modprobe.d/rtlsdr-blacklist.conf
+
+# Either way
+sudo vi /etc/sysctl.d/70-usb-buffer.conf
+  kernel.usbcore.usbfs_memory_mb = 0
+- or -
+echo "kernel.usbcore.usbfs_memory_mb = 0" | sudo tee /etc/sysctl.d/70-usb-buffer.conf
+sudo sysctl -p /etc/sysctl.d/70-usb-buffer.conf
+
 REBOOT
 PLUG IN DONGLE
 rtl_test

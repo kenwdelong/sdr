@@ -1,10 +1,15 @@
 ---
 
+# Well, this is sort of ok.  The real set of commands are in misc/condensedAiInstallation.txt
+# It's best to build a lot of stuff from source, as there are quirks and architectural stuff.
+# So this playbook is not really up-to-date.
+# See misc/SmartV5Bookworm.txt to see the exact versions of RPi and Pi OS that were used
+  
 - hosts: localhost
   become: True
   become_user: root
   connection: local
-  gather_facts: False
+  gather_facts: True
   vars:
     app_dir: /home/ken/apps
     user_name: ken
@@ -12,34 +17,27 @@
     gqrx_version: "2.17.5"
     
   tasks:
-    - name: blacklist the default driver
-      ansible.builtin.lineinfile: 
-        path: /etc/modprobe.d/blacklist-dvb.conf
-        #line: "blacklist dvb_usb_rtl28xxu"
-        line: "{{ item }}"
-        create: true
-      loop:
-        - blacklist dvb_usb_rtl28xxu
-        - blacklist rtl2832
-        - blacklist rtl2830
-
+	- name: Configure RTL-SDR kernel module blacklist
+	  ansible.builtin.copy:
+		content: |
+		  blacklist dvb_usb_rtl28xxu
+		  blacklist rtl2832
+		  blacklist rtl2830
+		  blacklist rtl2832_sdr
+		dest: /etc/modprobe.d/rtl-sdr-blacklist.conf
+		mode: '0644'
         
-    - name: install rtl-sdr drivers
+	- name: Configure USB power management
+	  ansible.builtin.shell: echo 'options usbcore autosuspend=-1' > /etc/modprobe.d/usb-autosuspend.conf
+	  args:
+		creates: /etc/modprobe.d/usb-autosuspend.conf
+	
+	- name: install rtl-sdr drivers
       ansible.builtin.apt:
         name: rtl-sdr
         state: present
         #force_apt_get: true
 
-    - name: add the rule file to the thingy
-      ansible.builtin.lineinfile: 
-        path: /etc/udev/rules.d/20.rtlsdr.rules
-        line: SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", GROUP="adm", MODE="0666", SYMLINK+="rtl_sdr"
-        create: true
-        
-    - name: restart udev
-      ansible.builtin.systemd:
-        name: udev
-        state: restarted
         
     - name: create app folder
       ansible.builtin.file:

@@ -1,12 +1,15 @@
 ---
 
+# This playbook assumes you have installed rtl_sdr and rtl-433 and that those are working!
+# See the misc/condensedAiInstalltion.txt for the script.
+  
 - hosts: localhost
   become: True
   become_user: root
   connection: local
-  gather_facts: False
+  gather_facts: True
   vars:
-    #weewx_home: /media/ken/umbrel1/weewx
+    weewx_root: /etc/weewx  # https://www.weewx.com/docs/5.1/usersguide/where/
     weewx_home: /opt/weewx
     weewx_html: "{{ weewx_home }}/html"
     weewx_database: "{{ weewx_home }}/data"
@@ -16,15 +19,29 @@
     # DOCS AT https://weewx.com/docs/5.0/
     # https://weewx.com/docs/5.0/quickstarts/debian/
     # See also  https://github.com/vinceskahan/weewx-sdr-howto/blob/main/howto.txt
-    - name: install weewx prereqs
+    - name: Install prerequisites
       ansible.builtin.apt:
-        name: wget, gnupg
+        name:
+          - wget
+          - gpg
+        update_cache: yes
+      register: apt_result
+    
+    - name: Add Weewx repository key
+      ansible.builtin.apt_key:
+        url: https://weewx.com/keys.html
+        state: present
+  
+    # INSTEAD OF SHELL COMMANDS
+    - name: Add Weewx repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=all] https://weewx.com/apt/python3 {{ ansible_distribution_release }} stable"
+        state: present
+        filename: weewx
 
-    - name: install weewx apt key
-      ansible.builtin.shell: wget -qO - https://weewx.com/keys.html | sudo gpg --dearmor --output /etc/apt/trusted.gpg.d/weewx.gpg
-      
-    - name: add weewx repository
-      ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 buster main" | sudo tee /etc/apt/sources.list.d/weewx.list
+      # AI prefers the task above to this 
+# 	- name: add weewx repository
+#      ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 bookworm stable" | sudo tee /etc/apt/sources.list.d/weewx.list
       
 #    - name: get the weewx pubkey
 #      ansible.builtin.shell: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FCCF0E2B09E
@@ -33,27 +50,15 @@
       # actually, it installed for me ok on 5.0.2-1
     - name: install weewx
       ansible.builtin.apt:
-        name: weewx=5.1, nginx
+        name: weewx, nginx
         update_cache: yes
        
       # SDR driver: https://github.com/matthewwall/weewx-sdr
+      # https://github.com/matthewwall/weewx-sdr/issues/183  for the 5.0 version
     - name: get the SDR driver
       #ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
       ansible.builtin.shell: weectl extension install https://github.com/matthewwall/weewx-sdr/archive/master.zip
 
-      # weewx executables in /usr/share/weewx
-      # https://github.com/matthewwall/weewx-sdr/issues/183  for the 5.0 version
-      # and it asks for permission, apparently not scriptable
-      # I had to run it by hand and then restart the playbook on the next step
-#    - name: install the SDR driver
-#      ansible.builtin.shell: weectl extension install weewx-sdr.zip
-
-#      This apparently adds to your weewx.conf file, which I've already done'      
-#    - name: configure the SDR driver
-#      ansible.builtin.shell: weectl station reconfigure --no-prompt --driver=user.sdr
-      # 4) run the driver directly to identify the packets you want to capture
-      # cd /etc/weewx/bin
-      # sudo PYTHONPATH=. python ./user/sdr.py --cmd="rtl_433 -M utc -F json"
       
     - name: Add weewx user to adm group
       ansible.builtin.user:
@@ -63,9 +68,6 @@
           - adm
           - plugdev
 
-    - name: do some shit with buffers
-      ansible.builtin.shell: echo 0 > /sys/module/usbcore/parameters/usbfs_memory_mb          
-          
     - name: create the custom weewx SSD directories
       ansible.builtin.file:
         state: directory
@@ -79,7 +81,7 @@
     - name: create weewx conf file
       ansible.builtin.template:
         src: weewx.conf
-        dest: /etc/weewx/weewx.conf
+        dest: "{{ weewx_root }}/weewx.conf"
         mode: '0644'
       
     - name: create nginx conf file
@@ -107,9 +109,8 @@
         state: restarted
         enabled: yes
         
-    - name: cron job for database backup
-      ansible.builtin.cron:
-        name: backup weewx database
+    - name: Create safe database backup
+      cron:
+        name: "weewx database backup"
         minute: "12"
-        job: "cp {{ weewx_database }}/weewx.sdb {{ weewx_database }}/weewx-backup.sdb"
-
+        job: "sqlite3 {{ weewx_database }}/weewx.sdb \".timeout 2000\" \".backup weewx-backup.sdb\""

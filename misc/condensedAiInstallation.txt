@@ -1,0 +1,91 @@
+sudo apt update && sudo apt install -y build-essential cmake git libusb-1.0-0-dev
+git clone https://gitea.osmocom.org/sdr/rtl-sdr.git
+cd rtl-sdr && mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DINSTALL_UDEV_RULES=ON ..
+make -j$(nproc)
+sudo make install
+sudo udevadm control --reload-rules && sudo udevadm trigger
+echo 'options usbcore autosuspend=-1' | sudo tee /etc/modprobe.d/usb-autosuspend.conf
+reboot
+echo 'on' | sudo tee /sys/bus/usb/devices/usb1/power/control
+echo -e "blacklist dvb_usb_rtl28xxu\nblacklist rtl2832\nblacklist rtl2830" | sudo tee /etc/modprobe.d/rtl-sdr-blacklist.conf
+echo "blacklist rtl2832_sdr" | sudo tee -a /etc/modprobe.d/rtl-sdr-blacklist.conf
+Plug in the dongle 
+lsmod | grep -E 'dvb_usb_rtl28xxu|rtl2832'  - should have no output
+rtl_test -p
+
+sudo apt install -y libtool libusb-1.0-0-dev librtlsdr-dev rtl-sdr cmake build-essential
+git clone https://github.com/merbanan/rtl_433.git
+cd rtl_433
+mkdir build
+cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+rtl_433 -S none
+
+
+=== OPTIONAL ===
+For permanent weewx integration, create this optimized configuration file:
+
+sudo mkdir -p /etc/rtl_433
+sudo tee /etc/rtl_433/weather.conf <<'EOF'
+# Focus only on weather sensors to reduce CPU usage
+device_query = "Nooelec, NESDR SMArt v5"
+freq = 433.92M
+report_meta = 0
+report_time = 0
+quiet = 1
+json_line = 1
+output = http://localhost:8000/rtl433
+EOF
+
+sudo tee /etc/systemd/system/rtl_433.service <<'EOF'
+[Unit]
+Description=RTL_433 Weather Sensor Receiver
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/rtl_433 -C customary -F json -M protocol -M time:iso -M tags -c /etc/rtl_433/weather.conf
+Restart=always
+RestartSec=5
+User=weewx
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+sudo systemctl enable rtl_433
+sudo systemctl start rtl_433
+
+systemctl status rtl_433
+journalctl -u rtl_433 -f
+
+
+=== WEEWX ===
+sudo wget -O /tmp/weewx-key.asc https://weewx.com/keys.html
+sudo gpg --dearmor -o /usr/share/keyrings/weewx-archive-keyring.gpg /tmp/weewx-key.asc
+echo "deb [signed-by=/usr/share/keyrings/weewx-archive-keyring.gpg] https://weewx.com/apt bookworm stable" | sudo tee /etc/apt/sources.list.d/weewx.list
+sudo apt update
+sudo apt install -y weewx
+sudo wee_extension --install=https://github.com/matthewwall/weewx-rtl_433/releases/latest/download/weewx-rtl_433.zip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
