@@ -17,22 +17,22 @@
     gqrx_version: "2.17.5"
     
   tasks:
-	- name: Configure RTL-SDR kernel module blacklist
-	  ansible.builtin.copy:
-		content: |
-		  blacklist dvb_usb_rtl28xxu
-		  blacklist rtl2832
-		  blacklist rtl2830
-		  blacklist rtl2832_sdr
-		dest: /etc/modprobe.d/rtl-sdr-blacklist.conf
-		mode: '0644'
-        
-	- name: Configure USB power management
-	  ansible.builtin.shell: echo 'options usbcore autosuspend=-1' > /etc/modprobe.d/usb-autosuspend.conf
-	  args:
-		creates: /etc/modprobe.d/usb-autosuspend.conf
-	
-	- name: install rtl-sdr drivers
+    - name: Configure RTL-SDR kernel module blacklist
+      ansible.builtin.copy:
+      content: |
+        blacklist dvb_usb_rtl28xxu
+        blacklist rtl2832
+        blacklist rtl2830
+        blacklist rtl2832_sdr
+      dest: /etc/modprobe.d/rtl-sdr-blacklist.conf
+      mode: '0644'
+          
+    - name: Configure USB power management
+      ansible.builtin.shell: echo 'options usbcore autosuspend=-1' > /etc/modprobe.d/usb-autosuspend.conf
+      args:
+      creates: /etc/modprobe.d/usb-autosuspend.conf
+  
+    - name: install rtl-sdr drivers
       ansible.builtin.apt:
         name: rtl-sdr
         state: present
