@@ -113,13 +113,6 @@
         state: restarted
         enabled: yes
 
-    - name: disable lighttpd
-      ansible.builtin.service:
-        name: lighttpd
-        state: stopped
-        enabled: no
-      ignore_errors: yes
-        
     - name: restart nginx service
       ansible.builtin.service:
         name: nginx
