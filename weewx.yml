@@ -102,6 +102,12 @@
         dest: "{{ weewx_root }}/weewx.conf"
         mode: '0644'
       
+    - name: create weewx Seasons skin file
+      ansible.builtin.copy:
+        src: skin.conf
+        dest: "{{ weewx_root }}/skins/Seasons/skin.conf"
+        mode: '0644'
+      
     - name: create nginx conf file
       ansible.builtin.template:
         src: nginx.conf
