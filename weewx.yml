@@ -75,7 +75,8 @@
     - name: get the SDR driver
       #ansible.builtin.shell: wget -O weewx-sdr.zip https://github.com/matthewwall/weewx-sdr/archive/master.zip
       ansible.builtin.shell: weectl extension install -y https://github.com/matthewwall/weewx-sdr/archive/master.zip
-
+      args:
+        creates: /etc/weewx/bin/user/sdr.py
       
     - name: Add weewx user to adm group
       ansible.builtin.user:
