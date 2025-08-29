@@ -124,3 +124,7 @@
         name: "weewx database backup"
         minute: "12"
         job: "sqlite3 {{ weewx_database }}/weewx.sdb \".timeout 2000\" \".backup weewx-backup.sdb\""
+        
+        
+# logs: sudo tail -f /var/log/syslog | grep weewx
+#       sudo journalctl -u weewx -f        
