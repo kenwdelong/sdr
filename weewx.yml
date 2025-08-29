@@ -40,7 +40,7 @@
         filename: weewx
 
       # AI prefers the task above to this 
-# 	- name: add weewx repository
+#    - name: add weewx repository
 #      ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 bookworm stable" | sudo tee /etc/apt/sources.list.d/weewx.list
       
 #    - name: get the weewx pubkey
