@@ -27,18 +27,35 @@
         update_cache: yes
       register: apt_result
     
+#      Why use "buster" instead of "bookworm":
+#
+#      The repository metadata identifies itself as "buster" even when accessed as "bookworm"
+#      This is common when repositories haven't been fully updated for newer Debian versions 7
+#      Modern key handling:
+#
+#      The keyring parameter in apt_key ensures proper GPG key storage in the modern location
+#      Avoids the deprecated /etc/apt/trusted.gpg approach mentioned in your warnings
+#      Repository structure explanation:
+#
+#      deb [arch=all signed-by=/usr/share/keyrings/weewx-archive-keyring.gpg] https://weewx.com/apt/python3 buster main
+#      |_________| |______________________________________________________| |_________________________| |______| |____|
+#          |                      |                                               |                    |       |
+#      Options              Key specification                                Repository URL       Distribution Component
+      
+      
     - name: Add Weewx repository key
       ansible.builtin.apt_key:
         url: https://weewx.com/keys.html
+        keyring: /usr/share/keyrings/weewx-archive-keyring.gpg
         state: present
-  
-    # INSTEAD OF SHELL COMMANDS
+
     - name: Add Weewx repository
       ansible.builtin.apt_repository:
-        repo: "deb [arch=all] https://weewx.com/apt/python3 {{ ansible_distribution_release }} stable"
+        repo: "deb [arch=all signed-by=/usr/share/keyrings/weewx-archive-keyring.gpg] https://weewx.com/apt/python3 buster main"
         state: present
         filename: weewx
-
+        update_cache: yes
+          
       # AI prefers the task above to this 
 #    - name: add weewx repository
 #      ansible.builtin.shell: echo "deb [arch=all] https://weewx.com/apt/python3 bookworm stable" | sudo tee /etc/apt/sources.list.d/weewx.list
