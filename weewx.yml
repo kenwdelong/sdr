@@ -127,4 +127,21 @@
         
         
 # logs: sudo tail -f /var/log/syslog | grep weewx
-#       sudo journalctl -u weewx -f        
+#       sudo journalctl -u weewx -f    
+# https://weewx.com/docs/5.1/usersguide/monitoring/#logging-on-macos
+# https://github.com/weewx/weewx/wiki/WeeWX-v4-and-logging
+#[Logging]
+#    # Path to dedicated log file
+#    log_file = /var/log/weewx/weewx.log
+#    
+#    # Log level (1=errors only, 2=errors/warnings, 3=verbose)
+#    log_level = 2
+#    
+#    # Rotate logs when they reach 10MB
+#    log_rotate_interval = 10000000
+#    
+#    # Keep 7 rotated logs
+#    log_rotate_files = 7
+#    
+#    # Optional: Log timestamps in local time
+#    log_console_time = True    
