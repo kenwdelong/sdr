@@ -1,0 +1,33 @@
+Installation:https://www.rtl-sdr.com/V4/
+
+Python Lib
+https://pyrtlsdr.readthedocs.io/en/latest/Overview.html#
+https://pysdr.org/content/rtlsdr.html
+
+Java USB Stackoverflow
+https://stackoverflow.com/questions/2121508/how-to-access-usb-ports-in-java
+
+USB4Java (2018)
+http://usb4java.org/
+
+JavaDoesUsb - Java 22
+https://github.com/manuelbl/JavaDoesUSB
+
+SDR Tutorials in Java
+https://www.g0kla.com/sdr/index.php
+https://github.com/ac2cz/SDR/tree/master/src/tutorialx
+
+SDR Java, 10 years old
+https://github.com/bertjan/sdr-java
+
+Java Foreign Functions
+https://docs.oracle.com/en/java/javase/21/core/foreign-function-and-memory-api.html
+
+Java wrapper, 5 years old
+https://github.com/itdaniher/rtlsdrj
+
+librtlsdr: A widely-used open-source library that provides a driver for RTL-SDR devices.
+pyrtlsdr: A Python wrapper for librtlsdr, which provides a Python API for accessing RTL-SDR devices.
+rtl-sdr: A command-line tool that provides a simple interface for accessing RTL-SDR devices.
+
+
