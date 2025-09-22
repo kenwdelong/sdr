@@ -1,0 +1,30 @@
+out: ['{"time" : "2025-09-22 03:18:45", "model" : "Ambientweather-F007TH", "id" : 188, "channel" : 1, "battery_ok" : 1, "temperature_F" : 77.000, "humidity" : 67, "mic" : "CRC"}\n', 
+'{"time" : "2025-09-22 03:18:47", "model" : "Ambientweather-F007TH", "id" : 137, "channel" : 4, "battery_ok" : 1, "temperature_F" : 86.500, "humidity" : 42, "mic" : "CRC"}\n']
+
+parsed: {'dateTime': 1758511125, 'usUnits': 1, 'temperature.1:188.AmbientF007THPacket': 77.0, 'humidity.1:188.AmbientF007THPacket': 67.0, 'battery.1:188.AmbientF007THPacket': 0, 'mod.1:188.AmbientF007THPacket': None, 'freq.1:188.AmbientF007THPacket': None, 'rssi.1:188.AmbientF007THPacket': None, 'snr.1:188.AmbientF007THPacket': None, 'noise.1:188.AmbientF007THPacket': None}
+
+parsed: {'dateTime': 1758511127, 'usUnits': 1, 'temperature.4:137.AmbientF007THPacket': 86.5, 'humidity.4:137.AmbientF007THPacket': 42.0, 'battery.4:137.AmbientF007THPacket': 0, 'mod.4:137.AmbientF007THPacket': None, 'freq.4:137.AmbientF007THPacket': None, 'rssi.4:137.AmbientF007THPacket': None, 'snr.4:137.AmbientF007THPacket': None, 'noise.4:137.AmbientF007THPacket': None}
+
+
+
+out: ['{"time" : "2025-09-22 03:18:56", "model" : "Ambientweather-F007TH", "id" : 10, "channel" : 3, "battery_ok" : 1, "temperature_F" : 83.000, "humidity" : 41, "mic" : "CRC"}\n']
+
+parsed: {'dateTime': 1758511136, 'usUnits': 1, 'temperature.3:10.AmbientF007THPacket': 83.0, 'humidity.3:10.AmbientF007THPacket': 41.0, 'battery.3:10.AmbientF007THPacket': 0, 'mod.3:10.AmbientF007THPacket': None, 'freq.3:10.AmbientF007THPacket': None, 'rssi.3:10.AmbientF007THPacket': None, 'snr.3:10.AmbientF007THPacket': None, 'noise.3:10.AmbientF007THPacket': None}
+
+
+
+out: ['{"time" : "2025-09-22 03:19:01", "model" : "Ambientweather-F007TH", "id" : 101, "channel" : 2, "battery_ok" : 1, "temperature_F" : 78.500, "humidity" : 70, "mic" : "CRC"}\n']
+
+parsed: {'dateTime': 1758511141, 'usUnits': 1, 'temperature.2:101.AmbientF007THPacket': 78.5, 'humidity.2:101.AmbientF007THPacket': 70.0, 'battery.2:101.AmbientF007THPacket': 0, 'mod.2:101.AmbientF007THPacket': None, 'freq.2:101.AmbientF007THPacket': None, 'rssi.2:101.AmbientF007THPacket': None, 'snr.2:101.AmbientF007THPacket': None, 'noise.2:101.AmbientF007THPacket': None}
+
+
+
+out: ['{"time" : "2025-09-22 03:19:38", "model" : "Ambientweather-F007TH", "id" : 188, "channel" : 1, "battery_ok" : 1, "temperature_F" : 77.000, "humidity" : 67, "mic" : "CRC"}\n']
+
+parsed: {'dateTime': 1758511178, 'usUnits': 1, 'temperature.1:188.AmbientF007THPacket': 77.0, 'humidity.1:188.AmbientF007THPacket': 67.0, 'battery.1:188.AmbientF007THPacket': 0, 'mod.1:188.AmbientF007THPacket': None, 'freq.1:188.AmbientF007THPacket': None, 'rssi.1:188.AmbientF007THPacket': None, 'snr.1:188.AmbientF007THPacket': None, 'noise.1:188.AmbientF007THPacket': None}
+
+
+
+out: ['{"time" : "2025-09-22 03:19:48", "model" : "Ambientweather-F007TH", "id" : 137, "channel" : 4, "battery_ok" : 1, "temperature_F" : 86.500, "humidity" : 42, "mic" : "CRC"}\n']
+
+parsed: {'dateTime': 1758511188, 'usUnits': 1, 'temperature.4:137.AmbientF007THPacket': 86.5, 'humidity.4:137.AmbientF007THPacket': 42.0, 'battery.4:137.AmbientF007THPacket': 0, 'mod.4:137.AmbientF007THPacket': None, 'freq.4:137.AmbientF007THPacket': None, 'rssi.4:137.AmbientF007THPacket': None, 'snr.4:137.AmbientF007THPacket': None, 'noise.4:137.AmbientF007THPacket': None}
