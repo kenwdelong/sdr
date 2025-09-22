@@ -1,0 +1,13 @@
+The pool sensor randomly changes it's house code every few days. 
+
+This is the hack I added to /etc/weewx/bin/user/sdr.py around line 1150.  If it's channel 4 (the pool), force the house code to 137 (which is currently the number in weewx.conf).
+
+
+
+        # === KENS MODIFICATIONS
+        channel = obj.get('channel', 0)
+        if channel == 4:
+            house_code = 137
+        else:
+            house_code = obj.get('id', 0) # This line was here before, and uncoditional
+        # === END MODIFICATIONS
